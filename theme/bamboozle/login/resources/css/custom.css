@@ -1,10 +1,104 @@
-/* Bamboozle Keycloak Theme */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
 
-.bamboozle-logo {
-  display: block;
-  max-width: 200px;
-  height: auto;
-  margin: 0 auto 1.5rem;
+* { box-sizing: border-box; }
+
+/* Override body to be a horizontal flex */
+body {
+  font-family: 'DM Sans', sans-serif !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
 }
 
-.kc-logo-text { display: none; }
+/* Inject left green panel via pseudo-element on body */
+body::before {
+  content: '';
+  display: block;
+  width: 38%;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0c4d08 0%, #1a6e14 100%);
+  flex-shrink: 0;
+}
+
+/* Logo top-left */
+.bamboozle-logo {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  width: 160px;
+  height: auto;
+  z-index: 10;
+  filter: brightness(0) invert(1);
+}
+
+/* Right side — center the form */
+body > *:not(.bamboozle-logo) {
+  flex: 1;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3rem !important;
+  background: #ffffff !important;
+}
+
+/* Remove Keywind's card styling */
+body > * > * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  max-width: 420px !important;
+  width: 100% !important;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  border: 1.5px solid #d1d5db !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  width: 100% !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus {
+  border-color: #4eac47 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(78,172,71,0.15) !important;
+}
+
+/* Sign In button */
+#kc-login, input[type="submit"] {
+  background: #4eac47 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  padding: 0.85rem !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+
+#kc-login:hover, input[type="submit"]:hover {
+  background: #0c4d08 !important;
+}
+
+/* Links */
+a { color: #4eac47 !important; }
+a:hover { color: #0c4d08 !important; }
+
+/* Labels */
+label {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+}

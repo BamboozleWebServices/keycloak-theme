@@ -1,0 +1,295 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-light: #4eac47;
+  --green-dark: #0c4d08;
+  --green-mid: #1a7a14;
+  --white: #ffffff;
+  --gray-400: #9ca3af;
+  --gray-600: #4b5563;
+  --gray-900: #111827;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--gray-900);
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f6 0%, #dde1e7 100%);
+}
+
+/* ── Left Panel ── */
+#kc-left-panel {
+  width: 38%;
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 100%);
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem;
+  z-index: 1;
+}
+
+#kc-left-panel .logo {
+  width: 220px;
+  height: auto;
+  display: block;
+}
+
+#kc-news {
+  flex: 1;
+  margin-top: 2rem;
+  overflow: hidden;
+}
+
+#kc-news h2 {
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.25rem;
+  opacity: 0.5;
+}
+
+.news-item {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-date {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.news-item strong {
+  display: block;
+  color: var(--white);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.news-item p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.tagline {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.tagline strong {
+  display: block;
+  color: var(--white);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Right Panel ── */
+#kc-right-panel {
+  margin-left: 38%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f6 0%, #dde1e7 100%);
+}
+
+/* ── Form Card ── */
+#kc-form-area {
+  width: 100%;
+  max-width: 420px;
+  background: var(--white);
+  border-radius: 0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 10px 30px -5px rgba(0,0,0,0.15);
+  padding: 2.5rem;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+/* ── Alerts ── */
+.alert {
+  padding: 0.85rem 1rem;
+  border-radius: 0;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+.alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.alert-warning { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.alert-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+/* ── Form Groups ── */
+.form-group { margin-bottom: 1.1rem; }
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: 0.35rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--gray-900);
+  background: var(--white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: var(--green-light);
+  box-shadow: 0 0 0 3px rgba(78,172,71,0.15);
+}
+
+/* Password wrapper */
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 3rem; }
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-400);
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+}
+.password-toggle:hover { color: var(--gray-600); }
+
+/* ── Options row ── */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.form-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gray-600);
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.form-options a {
+  color: var(--green-light);
+  text-decoration: none;
+  font-weight: 500;
+}
+.form-options a:hover { color: var(--green-dark); }
+
+/* ── Submit Button ── */
+#kc-login {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--green-light);
+  color: var(--white);
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 0.01em;
+}
+#kc-login:hover { background: var(--green-mid); }
+#kc-login:active { opacity: 0.95; }
+
+/* ── Register link ── */
+#kc-registration {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+#kc-registration a {
+  color: var(--green-light);
+  font-weight: 500;
+  text-decoration: none;
+}
+#kc-registration a:hover { color: var(--green-dark); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  #kc-left-panel { display: none; }
+  #kc-right-panel { margin-left: 0; }
+}
+
+/* ── Footer fixes ── */
+#kc-right-panel {
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 0 !important;
+}
+
+#kc-footer {
+  position: fixed;
+  bottom: 2rem;
+  left: calc(38% + 2rem);
+  right: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.footer-links a {
+  color: var(--green-dark) !important;
+  text-decoration: none !important;
+}
+
+.footer-links a:hover {
+  color: var(--green-light) !important;
+}
