@@ -4,7 +4,7 @@
     "description": "Bamboozle branded Keycloak login theme (child of Keywind)",
     "private": true,
     "scripts": {
-          "build": "cd node_modules/keywind && pnpm install && pnpm build && cd ../..",
+          "build": "cd node_modules/keywind && pnpm install --no-frozen-lockfile && npx vite build && cd ../..",
           "build:jar": "node scripts/build-jar.mjs"
     },
     "devDependencies": {
