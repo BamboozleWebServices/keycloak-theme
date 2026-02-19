@@ -1,14 +1,13 @@
 {
-  "name": "bamboozle-keycloak-theme",
-  "version": "1.0.0",
-  "description": "Bamboozle branded Keycloak login theme (child of Keywind)",
-  "private": true,
-  "scripts": {
-    "build": "pnpm --filter keywind build",
-    "build:jar": "node scripts/build-jar.mjs",
-    "dev": "pnpm --filter keywind dev"
-  },
-  "devDependencies": {
-    "keywind": "github:lukin/keywind"
-  }
+    "name": "bamboozle-keycloak-theme",
+    "version": "1.0.0",
+    "description": "Bamboozle branded Keycloak login theme (child of Keywind)",
+    "private": true,
+    "scripts": {
+          "build": "cd node_modules/keywind && pnpm install && pnpm build && cd ../..",
+          "build:jar": "node scripts/build-jar.mjs"
+    },
+    "devDependencies": {
+          "keywind": "github:lukin/keywind"
+    }
 }
