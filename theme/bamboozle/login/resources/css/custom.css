@@ -1,0 +1,10 @@
+/* Bamboozle Keycloak Theme */
+
+.bamboozle-logo {
+  display: block;
+  max-width: 200px;
+  height: auto;
+  margin: 0 auto 1.5rem;
+}
+
+.kc-logo-text { display: none; }
