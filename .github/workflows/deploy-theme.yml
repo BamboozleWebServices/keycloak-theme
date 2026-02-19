@@ -1,0 +1,104 @@
+name: Build & Deploy Keycloak Theme
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "theme/**"
+      - "tailwind.config.js"
+      - "META-INF/**"
+      - "scripts/**"
+      - ".github/workflows/deploy-theme.yml"
+  workflow_dispatch:
+
+env:
+  JAR_NAME: bamboozle-keycloak-theme.jar
+  KC_NAMESPACE: osie
+  KC_DEPLOYMENT: keycloak
+
+jobs:
+  build:
+    name: Build Theme JAR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Tailwind CSS
+        run: pnpm build
+
+      - name: Build JAR
+        run: pnpm build:jar
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: keycloak-theme-jar
+          path: ${{ env.JAR_NAME }}
+          retention-days: 30
+
+  deploy:
+    name: Deploy to MicroK8s
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: keycloak-theme-jar
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Get Keycloak pod name
+        id: get-pod
+        run: |
+          POD=$(kubectl get pod \
+            -n $KC_NAMESPACE \
+            -l app.kubernetes.io/name=keycloak \
+            -o jsonpath='{.items[0].metadata.name}')
+          echo "pod=$POD" >> $GITHUB_OUTPUT
+
+      - name: Copy JAR into pod
+        run: |
+          kubectl cp ${{ env.JAR_NAME }} \
+            $KC_NAMESPACE/${{ steps.get-pod.outputs.pod }}:/opt/keycloak/providers/${{ env.JAR_NAME }}
+
+      - name: Register theme (kc.sh build)
+        run: |
+          kubectl exec -n $KC_NAMESPACE ${{ steps.get-pod.outputs.pod }} \
+            -- /opt/keycloak/bin/kc.sh build
+
+      - name: Restart Keycloak
+        run: |
+          kubectl rollout restart deployment/$KC_DEPLOYMENT -n $KC_NAMESPACE
+          kubectl rollout status deployment/$KC_DEPLOYMENT -n $KC_NAMESPACE --timeout=120s
+
+      - name: Summary
+        run: |
+          echo "### Theme Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "Enable in Keycloak Admin: Realm Settings → Themes → Login Theme → bamboozle" >> $GITHUB_STEP_SUMMARY
