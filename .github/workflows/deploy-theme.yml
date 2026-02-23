@@ -83,14 +83,22 @@ jobs:
             -o jsonpath='{.items[0].metadata.name}')
           echo "pod=$POD" >> $GITHUB_OUTPUT
 
+      - name: Ensure providers directory exists
+        run: |
+          kubectl exec -n $KC_NAMESPACE ${{ steps.get-pod.outputs.pod }} \
+            -c keycloak \
+            -- mkdir -p /opt/keycloak/providers
+
       - name: Copy JAR into pod
         run: |
           kubectl cp ${{ env.JAR_NAME }} \
-            $KC_NAMESPACE/${{ steps.get-pod.outputs.pod }}:/opt/keycloak/providers/${{ env.JAR_NAME }}
+            $KC_NAMESPACE/${{ steps.get-pod.outputs.pod }}:/opt/keycloak/providers/${{ env.JAR_NAME }} \
+            -c keycloak
 
       - name: Register theme (kc.sh build)
         run: |
           kubectl exec -n $KC_NAMESPACE ${{ steps.get-pod.outputs.pod }} \
+            -c keycloak \
             -- /opt/keycloak/bin/kc.sh build
 
       - name: Restart Keycloak
