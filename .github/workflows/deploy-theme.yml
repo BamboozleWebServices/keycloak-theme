@@ -14,8 +14,8 @@ on:
 
 env:
   JAR_NAME: bamboozle-keycloak-theme.jar
-  KC_NAMESPACE: osie
-  KC_DEPLOYMENT: keycloak
+  KC_NAMESPACE: default
+  KC_DEPLOYMENT: osie-keycloak
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
           java-version: "17"
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile 
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build Tailwind CSS
         run: pnpm build
@@ -79,7 +79,7 @@ jobs:
         run: |
           POD=$(kubectl get pod \
             -n $KC_NAMESPACE \
-            -l app.kubernetes.io/name=keycloak \
+            -l app.kubernetes.io/component=keycloak \
             -o jsonpath='{.items[0].metadata.name}')
           echo "pod=$POD" >> $GITHUB_OUTPUT
 
@@ -95,8 +95,8 @@ jobs:
 
       - name: Restart Keycloak
         run: |
-          kubectl rollout restart deployment/$KC_DEPLOYMENT -n $KC_NAMESPACE
-          kubectl rollout status deployment/$KC_DEPLOYMENT -n $KC_NAMESPACE --timeout=120s
+          kubectl rollout restart statefulset/$KC_DEPLOYMENT -n $KC_NAMESPACE
+          kubectl rollout status statefulset/$KC_DEPLOYMENT -n $KC_NAMESPACE --timeout=120s
 
       - name: Summary
         run: |
