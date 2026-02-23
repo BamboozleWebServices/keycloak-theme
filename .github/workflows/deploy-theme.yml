@@ -9,18 +9,22 @@ on:
       - "tailwind.config.js"
       - "META-INF/**"
       - "scripts/**"
+      - "Dockerfile"
       - ".github/workflows/deploy-theme.yml"
   workflow_dispatch:
 
 env:
-  JAR_NAME: bamboozle-keycloak-theme.jar
-  KC_NAMESPACE: default
-  KC_DEPLOYMENT: osie-keycloak
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/bamboozlewebservices/keycloak-theme
 
 jobs:
-  build:
-    name: Build Theme JAR
+  build-and-push:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,78 +39,30 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Build Tailwind CSS
         run: pnpm build
 
-      - name: Build JAR
-        run: pnpm build:jar
-
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: keycloak-theme-jar
-          path: ${{ env.JAR_NAME }}
-          retention-days: 30
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
-    name: Deploy to MicroK8s
-    runs-on: ubuntu-latest
-    needs: build
-    environment: production
-    steps:
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v4
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
-          name: keycloak-theme-jar
-
-      - name: Configure kubectl
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
-
-      - name: Get Keycloak pod name
-        id: get-pod
-        run: |
-          POD=$(kubectl get pod \
-            -n $KC_NAMESPACE \
-            -l app.kubernetes.io/component=keycloak \
-            -o jsonpath='{.items[0].metadata.name}')
-          echo "pod=$POD" >> $GITHUB_OUTPUT
-
-      - name: Ensure providers directory exists
-        run: |
-          kubectl exec -n $KC_NAMESPACE ${{ steps.get-pod.outputs.pod }} \
-            -c keycloak \
-            -- mkdir -p /opt/keycloak/providers
-
-      - name: Copy JAR into pod
-        run: |
-          kubectl cp ${{ env.JAR_NAME }} \
-            $KC_NAMESPACE/${{ steps.get-pod.outputs.pod }}:/opt/keycloak/providers/${{ env.JAR_NAME }} \
-            -c keycloak
-
-      - name: Register theme (kc.sh build)
-        run: |
-          kubectl exec -n $KC_NAMESPACE ${{ steps.get-pod.outputs.pod }} \
-            -c keycloak \
-            -- /opt/keycloak/bin/kc.sh build
-
-      - name: Restart Keycloak
-        run: |
-          kubectl rollout restart statefulset/$KC_DEPLOYMENT -n $KC_NAMESPACE
-          kubectl rollout status statefulset/$KC_DEPLOYMENT -n $KC_NAMESPACE --timeout=120s
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Summary
         run: |
-          echo "### Theme Deployed" >> $GITHUB_STEP_SUMMARY
-          echo "Enable in Keycloak Admin: Realm Settings → Themes → Login Theme → bamboozle" >> $GITHUB_STEP_SUMMARY
+          echo "### Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "Image: \`${{ env.IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "Ask Sinan to run: \`helm --namespace default upgrade osie osie/osie -f values.yml\`" >> $GITHUB_STEP_SUMMARY
